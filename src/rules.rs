@@ -6,6 +6,17 @@ use crate::{Context, Error};
 
 #[poise::command(prefix_command)]
 pub async fn rules(ctx: Context<'_>) -> Result<(), Error> {
+    let author_id = ctx.author().id;
+    let owner_id: u64 = std::env::var("owner_id")
+        .expect("Missing owner_id")
+        .parse()
+        .expect("Invalid owner_id format");
+
+    if author_id != owner_id {
+        ctx.say("❌ You are not allowed to use this command.").await?;
+        return Ok(());
+    }
+
     let welcome_embed = CreateEmbed::default()
         .title("Welcome to the Conversia Support server!")
         .description("We're glad to have you here! Please take a moment to read the rules below so we can all enjoy a helpful and respectful community.")
