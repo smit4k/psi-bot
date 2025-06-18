@@ -14,11 +14,13 @@ async fn main() {
     dotenv().ok();
     
     let token = std::env::var("discord_token").expect("Missing discord_token");
-    let intents = serenity::GatewayIntents::GUILD_MESSAGES |serenity::GatewayIntents::MESSAGE_CONTENT;
+    let intents = serenity::GatewayIntents::GUILD_MESSAGES
+        | serenity::GatewayIntents::MESSAGE_CONTENT
+        | serenity::GatewayIntents::DIRECT_MESSAGES;
 
-    let framework = poise::Framework::builder()
+    let framework    = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![ping(), rules::rules(), announcement::announce()],
+            commands: vec![ping(), rules::rules()],
             
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("p!".into()),
@@ -45,6 +47,7 @@ async fn main() {
 
         let client = serenity::ClientBuilder::new(token, intents)
             .framework(framework)
+            .event_handler(announcement::AnnouncementHandler)
             .await;
 
         if let Err(err) = client.unwrap().start().await {
